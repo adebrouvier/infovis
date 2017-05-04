@@ -13,26 +13,20 @@
 	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 	    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>	    
 
-		<style>
+		<style>	    
 	    
-		#header{
-			margin:20px;			
-		}
-	    
-	    </style>
+	    </style>		
 
-		<div id="header">
-	    	
-	    </div>
+	    <div class="container">
 
-	    <div class="container" align="center">
-
-	    	<h1>Youtube Search History</h1>
-	    	<p>My Youtube search history from 2012-08-28 to 2017-04-27.</p>
+			<header style="text-align: center">
+	    		<h1>Youtube Search History</h1>
+	    		<p>My Youtube search history from 2012-08-28 to 2017-04-27.</p>
+	    	</header>
 			
 	    	<div class="row">
 			        <div class="dc-data-count">
-			            <span class="filter-count"></span> selected out of <span class="total-count"></span> records (<span id="percentage-searchs"></span>)| <a
+			            <span class="filter-count"></span> selected out of <span class="total-count"></span> records (<span id="percentage-searchs"></span>) | <a
 			                href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
 			        </div>			        
 		    </div>
@@ -65,25 +59,27 @@
 			        	<div class="clearfix"></div>
 					</div>
 				</div>
-
-				<div id="dayChart">
-					<strong>Weekday</strong>
-		        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
-		        	<a class="reset" href="javascript:dayChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-		        	<div class="clearfix"></div>
+				
+				<div class="col-md-6">
+					<div id="dayChart">	
+						<strong>Weekday</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:dayChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
 				</div>
-
-				<div id="hourChart">
-					<strong>Hour</strong>
-		        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
-		        	<a class="reset" href="javascript:hourChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-		        	<div class="clearfix"></div>
+				<div class="col-md-6">
+					<div id="hourChart">
+						<strong>Hour</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:hourChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
 				</div>				
 
 			</div>
 
-			<div class="row">
-				
+			<div class="row">			
 
 		    	<!--<table class="table table-hover dc-data-table">
 		    	</table>-->
@@ -95,10 +91,9 @@
 				dateChart = dc.barChart("#dateChart"),
 				yearChart = dc.pieChart("#yearChart"),
 				dayChart = dc.rowChart("#dayChart"),
-				hourChart = dc.lineChart("#hourChart"),
+				hourChart = dc.lineChart("#hourChart"),				
 				/*visTable = dc.dataTable(".dc-data-table"),*/
-				visCount = dc.dataCount(".dc-data-count");
-				
+				visCount = dc.dataCount(".dc-data-count");				
 
 			var percentage_searchs_number = dc.numberDisplay("#percentage-searchs");
 

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	      <meta charset="utf-8">
+	      <title>crossfilter.js & dc.js</title>	 
+	      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.0-beta.27/dc.min.css"/>
+	      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">	      
+	</head>
+	<body>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" charset="utf-8"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.4/dc.min.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>	    
+
+		<div class="container">
+
+	    	<h1>crossfilter.js & dc.js</h1>
+	    	<p>Visualization created using VAST Challenge 2017 MC1 dataset</p>
+			
+	    	<div class="row">
+			        <div class="dc-data-count">
+			            <span class="filter-count"></span> selected out of <span class="total-count"></span> records (<span id="percentage-visits"></span>) | <a
+			                href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+			        </div>			        
+		    </div>
+
+		    <div class="row">	
+
+				<div class="col-md-12">
+					<div id="dateChart">
+						<strong>Total</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:dateChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>
+				
+				<div class="col-md-6">
+					<div id="gateName">
+						<strong>Gate</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:gateNameChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div id="carType">
+						<strong>Car Type</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:carTypeChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div id="monthChart">
+						<strong>Month</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:monthChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>
+				
+				<div class="col-md-6">
+					<div id="dayChart">	
+						<strong>Weekday</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:dayChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div id="hourChart">
+						<strong>Per Hour</strong>
+			        	<span class="reset" style="display: none;">selected: <span class="filter"></span></span>
+			        	<a class="reset" href="javascript:hourChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+			        	<div class="clearfix"></div>
+					</div>
+				</div>				
+
+			</div>
+
+			<div class="row">
+		    	<table class="table table-hover dc-data-table">
+		    	</table>
+		    </div>
+		</div>
+
+		<script>
+			var monthChart = dc.rowChart("#monthChart"),
+				dateChart = dc.barChart("#dateChart"),
+				//yearChart = dc.pieChart("#yearChart"),
+				dayChart = dc.rowChart("#dayChart"),
+				carTypeChart = dc.pieChart("#carType"),
+				gateNameChart = dc.rowChart("#gateName"),
+				hourChart = dc.lineChart("#hourChart"),
+
+				visTable = dc.dataTable(".dc-data-table"),
+				visCount = dc.dataCount(".dc-data-count");				
+
+			var percentage_visits_number = dc.numberDisplay("#percentage-visits");
+
+			var month = [ "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dic"];
+			var day = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+			d3.csv("data.csv", function (data){
+				
+				data.forEach(function(data){
+					data.Timestamp=new Date(data.Timestamp);
+				});
+
+				var ndx = crossfilter(data);
+				var all = ndx.groupAll();
+
+				var dateDim = ndx.dimension(function(d){ return d.Timestamp;});
+				var yearDim = ndx.dimension(function(d){ return d.Timestamp.getFullYear();});
+				var monthDim = ndx.dimension(function(d){ return month[d.Timestamp.getMonth()];});
+				var dayDim = ndx.dimension(function(d){ return day[d.Timestamp.getDay()];});
+				var hourDim = ndx.dimension(function(d){ return d.Timestamp.getHours();});
+				var carTypeDim = ndx.dimension(function(d){ return d["car-type"];});
+				var gateNameDim = ndx.dimension(function(d){ return d["gate-name"];});
+
+				var dateGroup = dateDim.group(d3.time.day);				
+				var yearGroup = yearDim.group();
+				var monthGroup = monthDim.group();
+				var dayGroup = dayDim.group();
+				var hourGroup = hourDim.group();
+				var carTypeGroup = carTypeDim.group();
+				var gateNameGroup = gateNameDim.group(); 
+
+				var dateChartWidth=900;
+
+				dateChart
+					.width(dateChartWidth)					
+					.dimension(dateDim)
+					.elasticX(true)
+					.elasticY(true)
+					.brushOn(true)
+					.renderHorizontalGridLines(true)
+					.x(d3.time.scale().domain([new Date('2015-05-01'), new Date('2016-31-05')]).range([0,dateChartWidth]))	
+					.group(dateGroup);				
+
+				monthChart
+					.width(500)
+					.height(400)
+					.dimension(monthDim)
+					.elasticX(true)
+					.group(monthGroup)
+					.ordinalColors(d3.scale.category20().range())
+					.ordering(function(d){
+						switch(d.key){
+							case 'Jan': 
+    							return 0;
+    							break;
+    						case 'Feb': 
+    							return 1;
+    							break;
+    						case 'Mar': 
+    							return 2;
+    							break;
+    						case 'Apr': 
+    							return 3;
+    							break;
+    						case 'May': 
+    							return 4;
+    							break;
+    						case 'Jun': 
+    							return 5;
+    							break;
+    						case 'Jul': 
+    							return 6;  
+    							break;
+    						case 'Aug': 
+    							return 7;
+    							break;
+    						case 'Sep': 
+    							return 8;
+    							break;
+    						case 'Oct': 
+    							return 9;
+    							break;
+    						case 'Nov': 
+    							return 10;
+    							break;
+    						case 'Dic': 
+    							return 11;
+    							break;
+						}
+					});				
+
+				dayChart
+					.width(400)
+					.height(400)
+					.dimension(dayDim)
+					.elasticX(true)
+					.group(dayGroup)					
+					.ordinalColors(d3.scale.category10().range())
+					.ordering(function(d) {						
+
+    					switch (d.key){
+    						case 'Mon': 
+    							return 0;
+    							break;
+    						case 'Tue': 
+    							return 1;
+    							break;
+    						case 'Wed': 
+    							return 2;
+    							break;
+    						case 'Thu': 
+    							return 3;
+    							break;
+    						case 'Fri': 
+    							return 4;
+    							break;
+    						case 'Sat': 
+    							return 5;
+    							break;
+    						case 'Sun': 
+    							return 6;    							
+    					}
+					})
+					.xAxis().ticks(8);
+
+				hourChart
+					.width(500)
+					.height(400)
+					.dimension(hourDim)
+					.x(d3.scale.linear().domain([0,23]))
+					.elasticY(true)
+				    .interpolate('linear')
+				    .renderArea(true)
+				    .brushOn(false)
+				    .yAxisLabel('Visits')
+				    .renderDataPoints(true)
+				    .clipPadding(10)				    
+					.group(hourGroup);
+
+				/*yearChart 
+        			.width(400)
+        			.height(400)        			
+        			.minAngleForLabel(0)
+        			.dimension(yearDim)
+        			.externalLabels(50)
+        			.externalRadiusPadding(60)        			
+        			.drawPaths(true)
+        			.ordinalColors(d3.scale.category10().range())
+        			.group(yearGroup);  */
+
+        		gateNameChart
+        			.height(400)
+        			.width(400)        			
+        			.data(function(group){return group.top(10);})
+        			.ordinalColors(d3.scale.category10().range())
+        			.elasticX(true)
+        			.dimension(gateNameDim)
+        			.group(gateNameGroup);
+
+        		carTypeChart
+        			.height(400)
+        			.externalLabels(50)
+        			.externalRadiusPadding(60)
+        			.minAngleForLabel(0)
+        			.drawPaths(true)
+        			.dimension(carTypeDim)
+        			.group(carTypeGroup)
+        			.ordinalColors(d3.scale.category10().range());
+
+        		percentage_visits_number
+        			.valueAccessor(function(d){        				
+        				return d/data.length;
+        			})
+        			.formatNumber(d3.format(".2%"))
+        			.group(all);
+
+				visCount
+					.dimension(ndx)
+					.group(all);
+
+				visTable
+					.dimension(dateDim)
+					.group(function (d) {
+						var format = d3.format('02d');
+						return d.Timestamp.getFullYear() + ', ' + month[d.Timestamp.getMonth()];
+					})
+					.columns(["Timestamp","car-id","car-type","gate-name"])
+					.size(50);
+
+				dc.renderAll();
+
+			});
+			
+		</script>
+
+	</body>
+</html>

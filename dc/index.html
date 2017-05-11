@@ -130,7 +130,7 @@
 				var carTypeGroup = carTypeDim.group();
 				var gateNameGroup = gateNameDim.group(); 
 
-				var dateChartWidth=900;
+				var dateChartWidth=1000;
 
 				dateChart
 					.width(dateChartWidth)					
@@ -138,6 +138,7 @@
 					.elasticX(true)
 					.elasticY(true)
 					.brushOn(true)
+					.margins({top: 30, right: 50, bottom: 25, left: 40})
 					.renderHorizontalGridLines(true)
 					.x(d3.time.scale().domain([new Date('2015-05-01'), new Date('2016-31-05')]).range([0,dateChartWidth]))	
 					.group(dateGroup);				
@@ -233,6 +234,7 @@
 				    .interpolate('linear')
 				    .renderArea(true)
 				    .brushOn(false)
+				    .margins({top: 30, right: 50, bottom: 25, left: 40})
 				    .renderDataPoints(true)
 				    .clipPadding(10)				    
 					.group(hourGroup);
